@@ -26,7 +26,7 @@ $(TESTS_DIR)/%.o: $(TESTS_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: $(TEST_OBJ) $(LIB_NAME)
-	$(CC) $(CFLAGS) $(TEST_OBJ) $(LIB_NAME) -o $(TEST_EXE)
+	$(CC) $(CFLAGS) $(TEST_OBJ) -L. -lstack -o $(TEST_EXE)
 	./$(TEST_EXE)
 
 clean:
