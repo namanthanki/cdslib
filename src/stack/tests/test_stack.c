@@ -14,7 +14,7 @@ void test_int_stack()
     }
 
     int value = 10;
-    if (push_int(stack, value) == 0)
+    if (push_int(stack, value) == STACK_SUCCESS)
     {
         printf("Pushed %d onto int stack\n", value);
     }
@@ -24,7 +24,7 @@ void test_int_stack()
     }
 
     int output;
-    if (peek_int(stack, &output) == 0)
+    if (peek_int(stack, &output) == STACK_SUCCESS)
     {
         printf("Peeked %d from int stack\n", output);
     }
@@ -33,7 +33,7 @@ void test_int_stack()
         printf("Failed to peek from int stack\n");
     }
 
-    if (pop_int(stack, &output) == 0)
+    if (pop_int(stack, &output) == STACK_SUCCESS)
     {
         printf("Popped %d from int stack\n", output);
     }
@@ -58,7 +58,7 @@ void test_float_stack()
     }
 
     float value = 10.5f;
-    if (push_float(stack, value) == 0)
+    if (push_float(stack, value) == STACK_SUCCESS)
     {
         printf("Pushed %f onto float stack\n", value);
     }
@@ -68,7 +68,7 @@ void test_float_stack()
     }
 
     float output;
-    if (peek_float(stack, &output) == 0)
+    if (peek_float(stack, &output) == STACK_SUCCESS)
     {
         printf("Peeked %f from float stack\n", output);
     }
@@ -77,7 +77,7 @@ void test_float_stack()
         printf("Failed to peek from float stack\n");
     }
 
-    if (pop_float(stack, &output) == 0)
+    if (pop_float(stack, &output) == STACK_SUCCESS)
     {
         printf("Popped %f from float stack\n", output);
     }
@@ -102,7 +102,7 @@ void test_double_stack()
     }
 
     double value = 20.25;
-    if (push_double(stack, value) == 0)
+    if (push_double(stack, value) == STACK_SUCCESS)
     {
         printf("Pushed %f onto double stack\n", value);
     }
@@ -112,7 +112,7 @@ void test_double_stack()
     }
 
     double output;
-    if (peek_double(stack, &output) == 0)
+    if (peek_double(stack, &output) == STACK_SUCCESS)
     {
         printf("Peeked %f from double stack\n", output);
     }
@@ -121,7 +121,7 @@ void test_double_stack()
         printf("Failed to peek from double stack\n");
     }
 
-    if (pop_double(stack, &output) == 0)
+    if (pop_double(stack, &output) == STACK_SUCCESS)
     {
         printf("Popped %f from double stack\n", output);
     }
@@ -146,7 +146,7 @@ void test_string_stack()
     }
 
     const char *value = "hello";
-    if (push_string(stack, value) == 0)
+    if (push_string(stack, value) == STACK_SUCCESS)
     {
         printf("Pushed \"%s\" onto string stack\n", value);
     }
@@ -156,7 +156,7 @@ void test_string_stack()
     }
 
     char *output = NULL;
-    if (peek_string(stack, &output) == 0)
+    if (peek_string(stack, &output) == STACK_SUCCESS)
     {
         printf("Peeked \"%s\" from string stack\n", output);
     }
@@ -165,7 +165,7 @@ void test_string_stack()
         printf("Failed to peek from string stack\n");
     }
 
-    if (pop_string(stack, &output) == 0)
+    if (pop_string(stack, &output) == STACK_SUCCESS)
     {
         printf("Popped \"%s\" from string stack\n", output);
         free(output); // Free the duplicated string
@@ -175,7 +175,7 @@ void test_string_stack()
         printf("Failed to pop from string stack\n");
     }
 
-    free_stack(stack);
+    free_string_stack(stack);
     printf("String stack test complete\n\n");
 }
 
@@ -192,11 +192,11 @@ void test_string_stack_extended()
 
     // Test peek and pop on empty stack
     char *output = NULL;
-    if (peek_string(stack, &output) != 0)
+    if (peek_string(stack, &output) == STACK_UNDERFLOW)
     {
         printf("Correctly failed to peek from empty stack\n");
     }
-    if (pop_string(stack, &output) != 0)
+    if (pop_string(stack, &output) == STACK_UNDERFLOW)
     {
         printf("Correctly failed to pop from empty stack\n");
     }
@@ -205,7 +205,7 @@ void test_string_stack_extended()
     const char *values[] = {"first", "second", "third", "fourth", "fifth"};
     for (int i = 0; i < 5; i++)
     {
-        if (push_string(stack, values[i]) == 0)
+        if (push_string(stack, values[i]) == STACK_SUCCESS)
         {
             printf("Pushed \"%s\" onto string stack\n", values[i]);
         }
@@ -214,18 +214,18 @@ void test_string_stack_extended()
     // Peek and pop in reverse order
     for (int i = 4; i >= 0; i--)
     {
-        if (peek_string(stack, &output) == 0)
+        if (peek_string(stack, &output) == STACK_SUCCESS)
         {
             printf("Peeked \"%s\" from string stack\n", output);
         }
-        if (pop_string(stack, &output) == 0)
+        if (pop_string(stack, &output) == STACK_SUCCESS)
         {
             printf("Popped \"%s\" from string stack\n", output);
             free(output);
         }
     }
 
-    free_stack(stack);
+    free_string_stack(stack);
     printf("Extended string stack test complete\n\n");
 }
 

@@ -4,28 +4,20 @@
 
 stack_t *create_string_stack()
 {
-    stack_t *stack = create_stack(sizeof(char *));
-    // if (stack)
-    // {
-    //     printf("Debug: Created string stack with element_size = %zu\n", stack->element_size);
-    // }
-    return stack;
+    return create_stack(sizeof(char *));
 }
 
-int push_string(stack_t *stack, const char *value)
+stack_error_t push_string(stack_t *stack, const char *value)
 {
     char *copy = strdup(value);
     if (!copy)
     {
-        return -1;
+        return STACK_MEMORY_ERROR;
     }
 
-    // printf("Debug: push_string - Copied string: %s\n", copy);
-    // printf("Debug: push_string - Address of copy: %p\n", (void *)copy);
+    stack_error_t result = push(stack, &copy);
 
-    int result = push(stack, &copy);
-
-    if (result != 0)
+    if (result != STACK_SUCCESS)
     {
         free(copy);
     }
@@ -33,25 +25,29 @@ int push_string(stack_t *stack, const char *value)
     return result;
 }
 
-int pop_string(stack_t *stack, char **value)
+stack_error_t pop_string(stack_t *stack, char **value)
 {
     char *popped_value;
-    int result = pop(stack, &popped_value);
-    if (result == 0)
+    stack_error_t result = pop(stack, &popped_value);
+    if (result == STACK_SUCCESS)
     {
         *value = popped_value;
-        // printf("Debug: pop_string - Popped value: %s\n", *value);
     }
     return result;
 }
 
-int peek_string(stack_t *stack, char **value)
+stack_error_t peek_string(stack_t *stack, char **value)
 {
-    printf("Debug: peek_string called\n");
-    int result = peek(stack, value);
-    // if (result == 0)
-    // {
-    //     printf("Debug: peek_string - Peeked value: %s\n", *value);
-    // }
-    return result;
+    return peek(stack, value);
+}
+
+void free_string_stack(stack_t *stack)
+{
+    while (stack->top >= 0)
+    {
+        char *value;
+        pop_string(stack, &value);
+        free(value);
+    }
+    free_stack(stack);
 }

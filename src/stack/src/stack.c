@@ -22,54 +22,51 @@ stack_t *create_stack(size_t element_size)
     return stack;
 }
 
-int push(stack_t *stack, void *element)
+stack_error_t push(stack_t *stack, const void *element)
 {
     if (stack->top == stack->capacity - 1)
     {
-        void **new_data = (void **)realloc(stack->data, sizeof(void *) * stack->capacity * 2);
-        if (!new_data)
+        stack_error_t resize_result = resize_stack(stack, stack->capacity * 2);
+        if (resize_result != STACK_SUCCESS)
         {
-            return -1;
+            return resize_result;
         }
-
-        stack->data = new_data;
-        stack->capacity *= 2;
     }
 
     stack->top++;
     stack->data[stack->top] = (void *)malloc(stack->element_size);
     if (!stack->data[stack->top])
     {
-        return -1;
+        return STACK_MEMORY_ERROR;
     }
     memcpy(stack->data[stack->top], element, stack->element_size);
-    return 0;
+    return STACK_SUCCESS;
 }
 
-int pop(stack_t *stack, void *output)
+stack_error_t pop(stack_t *stack, void *output)
 {
     if (stack->top == -1)
     {
-        return -1;
+        return STACK_UNDERFLOW;
     }
 
     memcpy(output, stack->data[stack->top], stack->element_size);
     free(stack->data[stack->top]);
     stack->top--;
 
-    return 0;
+    return STACK_SUCCESS;
 }
 
-int peek(stack_t *stack, void *output)
+stack_error_t peek(stack_t *stack, void *output)
 {
     if (stack->top == -1)
     {
-        return -1;
+        return STACK_UNDERFLOW;
     }
 
     memcpy(output, stack->data[stack->top], stack->element_size);
 
-    return 0;
+    return STACK_SUCCESS;
 }
 
 void free_stack(stack_t *stack)
@@ -81,4 +78,18 @@ void free_stack(stack_t *stack)
 
     free(stack->data);
     free(stack);
+}
+
+stack_error_t resize_stack(stack_t *stack, int new_capacity)
+{
+    void **new_data = (void **)realloc(stack->data, sizeof(void *) * new_capacity);
+    if (!new_data)
+    {
+        return STACK_MEMORY_ERROR;
+    }
+
+    stack->data = new_data;
+    stack->capacity = new_capacity;
+
+    return STACK_SUCCESS;
 }
