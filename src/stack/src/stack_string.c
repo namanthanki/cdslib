@@ -1,5 +1,4 @@
 #include "stack.h"
-#include <stdio.h>
 #include <string.h>
 
 stack_t *create_string_stack()

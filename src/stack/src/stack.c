@@ -8,7 +8,7 @@ stack_t *create_stack(size_t element_size)
         return NULL;
     }
 
-    stack->data = (void **)malloc(sizeof(void *) * 10);
+    stack->data = (void **)malloc(sizeof(void *) * 100);
     if (!stack->data)
     {
         free(stack);
@@ -16,7 +16,7 @@ stack_t *create_stack(size_t element_size)
     }
 
     stack->top = -1;
-    stack->capacity = 10;
+    stack->capacity = 100;
     stack->element_size = element_size;
 
     return stack;
@@ -69,17 +69,6 @@ stack_error_t peek(stack_t *stack, void *output)
     return STACK_SUCCESS;
 }
 
-void free_stack(stack_t *stack)
-{
-    for (int i = 0; i <= stack->top; i++)
-    {
-        free(stack->data[i]);
-    }
-
-    free(stack->data);
-    free(stack);
-}
-
 stack_error_t resize_stack(stack_t *stack, int new_capacity)
 {
     void **new_data = (void **)realloc(stack->data, sizeof(void *) * new_capacity);
@@ -92,4 +81,15 @@ stack_error_t resize_stack(stack_t *stack, int new_capacity)
     stack->capacity = new_capacity;
 
     return STACK_SUCCESS;
+}
+
+void free_stack(stack_t *stack)
+{
+    for (int i = 0; i <= stack->top; i++)
+    {
+        free(stack->data[i]);
+    }
+
+    free(stack->data);
+    free(stack);
 }
