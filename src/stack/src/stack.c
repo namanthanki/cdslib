@@ -1,5 +1,15 @@
 #include "stack.h"
 
+int is_stack_full(stack_t *stack)
+{
+    return stack->top == stack->capacity - 1;
+}
+
+int is_stack_empty(stack_t *stack)
+{
+    return stack->top == -1;
+}
+
 stack_t *create_stack(size_t element_size)
 {
     stack_t *stack = (stack_t *)malloc(sizeof(stack_t));
@@ -24,7 +34,7 @@ stack_t *create_stack(size_t element_size)
 
 stack_error_t push(stack_t *stack, const void *element)
 {
-    if (stack->top == stack->capacity - 1)
+    if (is_stack_full(stack))
     {
         stack_error_t resize_result = resize_stack(stack, stack->capacity * 2);
         if (resize_result != STACK_SUCCESS)
@@ -45,7 +55,7 @@ stack_error_t push(stack_t *stack, const void *element)
 
 stack_error_t pop(stack_t *stack, void *output)
 {
-    if (stack->top == -1)
+    if (is_stack_empty(stack))
     {
         return STACK_UNDERFLOW;
     }
@@ -59,7 +69,7 @@ stack_error_t pop(stack_t *stack, void *output)
 
 stack_error_t peek(stack_t *stack, void *output)
 {
-    if (stack->top == -1)
+    if (is_stack_empty(stack))
     {
         return STACK_UNDERFLOW;
     }
