@@ -2,12 +2,12 @@
 
 int is_stack_full(stack_t *stack)
 {
-    return stack->top == stack->capacity - 1;
+    return stack->size == stack->capacity;
 }
 
 int is_stack_empty(stack_t *stack)
 {
-    return stack->top == -1;
+    return stack->size == 0;
 }
 
 stack_t *create_stack(size_t element_size)
@@ -26,6 +26,7 @@ stack_t *create_stack(size_t element_size)
     }
 
     stack->top = -1;
+    stack->size = 0;
     stack->capacity = 100;
     stack->element_size = element_size;
 
@@ -50,6 +51,8 @@ stack_error_t push(stack_t *stack, const void *element)
         return STACK_MEMORY_ERROR;
     }
     memcpy(stack->data[stack->top], element, stack->element_size);
+    
+    stack->size++;
     return STACK_SUCCESS;
 }
 
@@ -63,7 +66,7 @@ stack_error_t pop(stack_t *stack, void *output)
     memcpy(output, stack->data[stack->top], stack->element_size);
     free(stack->data[stack->top]);
     stack->top--;
-
+    stack->size--;
     return STACK_SUCCESS;
 }
 

@@ -17,6 +17,7 @@ typedef struct
     void **data;
     int top;
     int capacity;
+    int size;
     size_t element_size;
 } stack_t;
 
