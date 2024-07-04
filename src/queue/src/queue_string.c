@@ -42,7 +42,7 @@ queue_error_t peek_string(queue_t *queue, char **value)
 
 void free_string_queue(queue_t *queue)
 {
-    while (queue->front != NULL)
+    while (queue->front != queue->rear)
     {
         char *value;
         dequeue_string(queue, &value);

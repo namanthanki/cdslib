@@ -1,5 +1,20 @@
 #include "queue.h"
 
+int is_queue_full(queue_t *queue)
+{
+    return queue->size == queue->capacity;
+}
+
+int is_queue_empty(queue_t *queue)
+{
+    return queue->size == 0;
+}
+
+int queue_size(queue_t *queue)
+{
+    return queue->size;
+}
+
 queue_t *create_queue(size_t element_size)
 {
     queue_t *queue = (queue_t *)malloc(sizeof(queue_t));
@@ -115,19 +130,4 @@ void free_queue(queue_t *queue)
 
     free(queue->data);
     free(queue);
-}
-
-int is_queue_full(queue_t *queue)
-{
-    return queue->size == queue->capacity;
-}
-
-int is_queue_empty(queue_t *queue)
-{
-    return queue->size == 0;
-}
-
-int queue_size(queue_t *queue)
-{
-    return queue->size;
 }
