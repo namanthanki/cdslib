@@ -2,6 +2,50 @@
 #include <string.h>
 #include "stack.h"
 
+void test_char_stack()
+{
+    printf("Testing char stack...\n");
+
+    stack_t *stack = create_char_stack();
+    if (!stack)
+    {
+        printf("Failed to create char stack\n");
+        return;
+    }
+
+    char value = 'a';
+    if (push_char(stack, value) == STACK_SUCCESS)
+    {
+        printf("Pushed '%c' onto char stack\n", value);
+    }
+    else
+    {
+        printf("Failed to push '%c' onto char stack\n", value);
+    }
+
+    char output;
+    if (peek_char(stack, &output) == STACK_SUCCESS)
+    {
+        printf("Peeked '%c' from char stack\n", output);
+    }
+    else
+    {
+        printf("Failed to peek from char stack\n");
+    }
+
+    if (pop_char(stack, &output) == STACK_SUCCESS)
+    {
+        printf("Popped '%c' from char stack\n", output);
+    }
+    else
+    {
+        printf("Failed to pop from char stack\n");
+    }
+
+    free_stack(stack);
+    printf("Char stack test complete\n\n");
+}
+
 void test_int_stack()
 {
     printf("Testing int stack...\n");
@@ -231,6 +275,7 @@ void test_string_stack_extended()
 
 int main()
 {
+    test_char_stack();
     test_int_stack();
     test_float_stack();
     test_double_stack();
