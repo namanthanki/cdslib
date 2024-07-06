@@ -12,7 +12,7 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.c, $(SRC_DIR)/%.o, $(SRC_FILES))
 TEST_SRC = $(wildcard $(TESTS_DIR)/*.c)
 TEST_OBJ = $(patsubst $(TESTS_DIR)/%.c, $(TESTS_DIR)/%.o, $(TEST_SRC))
 
-TEST_EXE = test_stack
+TEST_EXE = test_queue
 
 all: $(LIB_NAME)
 
