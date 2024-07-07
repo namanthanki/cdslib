@@ -16,8 +16,8 @@ typedef struct
 {
     void **data;
     int top;
-    int capacity;
-    int size;
+    size_t capacity;
+    size_t size;
     size_t element_size;
 } stack_t;
 
@@ -26,7 +26,8 @@ stack_t *create_stack(size_t element_size);
 stack_error_t push(stack_t *stack, const void *element);
 stack_error_t pop(stack_t *stack, void *output);
 stack_error_t peek(stack_t *stack, void *output);
-stack_error_t resize_stack(stack_t *stack, int new_capacity);
+stack_error_t resize_stack(stack_t *stack, size_t new_capacity);
+stack_error_t shrink_stack(stack_t *stack);
 void free_stack(stack_t *stack);
 
 // char

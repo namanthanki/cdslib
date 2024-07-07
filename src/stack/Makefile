@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -g -I$(INC_DIR)
+CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -g -I../../includes -I$(INC_DIR)
 
 LIB_NAME = libstack.a
 
@@ -14,10 +14,12 @@ TEST_OBJ = $(patsubst $(TESTS_DIR)/%.c, $(TESTS_DIR)/%.o, $(TEST_SRC))
 
 TEST_EXE = test_stack
 
+UTILS_OBJ = ../../src/data_structure_utils.o
+
 all: $(LIB_NAME)
 
-$(LIB_NAME): $(OBJ_FILES)
-	ar rcs $(LIB_NAME) $(OBJ_FILES)
+$(LIB_NAME): $(OBJ_FILES) $(UTILS_OBJ)
+	ar rcs $(LIB_NAME) $(OBJ_FILES) $(UTILS_OBJ)
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -26,7 +28,7 @@ $(TESTS_DIR)/%.o: $(TESTS_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 test: $(TEST_OBJ) $(LIB_NAME)
-	$(CC) $(CFLAGS) $(TEST_OBJ) -L. -lstack -o $(TEST_EXE)
+	$(CC) $(CFLAGS) $(TEST_OBJ) $(UTILS_OBJ) -L. -lstack -o $(TEST_EXE)
 	./$(TEST_EXE)
 
 clean:

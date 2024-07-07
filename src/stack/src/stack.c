@@ -1,4 +1,5 @@
 #include "stack.h"
+#include "data_structure_utils.h"
 
 int is_stack_full(stack_t *stack)
 {
@@ -33,6 +34,50 @@ stack_t *create_stack(size_t element_size)
     return stack;
 }
 
+void copy_func (void *dest, void *src, size_t size) {
+    memcpy(dest, src, size);
+}
+
+void free_func(void *data)
+{
+    free(data);
+}
+
+stack_error_t resize_stack(stack_t *stack, size_t new_capacity)
+{
+    resize_error_t result = resize_data_structure(
+        (void **)&stack->data,
+        &stack->capacity,
+        &stack->size,
+        stack->element_size,
+        new_capacity,
+        copy_func,
+        free_func);
+
+    if (result != RESIZE_SUCCESS)
+    {
+        return STACK_MEMORY_ERROR;
+    }
+
+    return STACK_SUCCESS;
+}
+
+stack_error_t shrink_stack(stack_t *stack)
+{
+    resize_error_t result = shrink_data_structure(
+        stack,
+        &stack->capacity,
+        &stack->size,
+        (resize_func_t)resize_stack);
+
+    if (result != RESIZE_SUCCESS)
+    {
+        return STACK_MEMORY_ERROR;
+    }
+
+    return STACK_SUCCESS;
+}
+
 stack_error_t push(stack_t *stack, const void *element)
 {
     if (is_stack_full(stack))
@@ -51,7 +96,7 @@ stack_error_t push(stack_t *stack, const void *element)
         return STACK_MEMORY_ERROR;
     }
     memcpy(stack->data[stack->top], element, stack->element_size);
-    
+
     stack->size++;
     return STACK_SUCCESS;
 }
@@ -78,20 +123,6 @@ stack_error_t peek(stack_t *stack, void *output)
     }
 
     memcpy(output, stack->data[stack->top], stack->element_size);
-
-    return STACK_SUCCESS;
-}
-
-stack_error_t resize_stack(stack_t *stack, int new_capacity)
-{
-    void **new_data = (void **)realloc(stack->data, sizeof(void *) * new_capacity);
-    if (!new_data)
-    {
-        return STACK_MEMORY_ERROR;
-    }
-
-    stack->data = new_data;
-    stack->capacity = new_capacity;
 
     return STACK_SUCCESS;
 }

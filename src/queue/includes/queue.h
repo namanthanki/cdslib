@@ -17,8 +17,8 @@ typedef struct
     void **data;
     int front;
     int rear;
-    int size;
-    int capacity;
+    size_t size;
+    size_t capacity;
     size_t element_size;
 } queue_t;
 
@@ -27,7 +27,8 @@ queue_t *create_queue(size_t element_size);
 queue_error_t enqueue(queue_t *queue, const void *element);
 queue_error_t dequeue(queue_t *queue, void *output);
 queue_error_t peek(queue_t *queue, void *output);
-queue_error_t resize_queue(queue_t *queue, int new_capacity);
+queue_error_t resize_queue(queue_t *queue, size_t new_capacity);
+queue_error_t shrink_queue(queue_t *queue);
 void free_queue(queue_t *queue);
 
 // char

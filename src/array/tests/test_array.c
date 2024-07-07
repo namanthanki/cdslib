@@ -267,26 +267,53 @@ void test_string_array_extended()
         }
     }
 
-    // Test get and remove on populated array
-    if (get_string(arr, 1, &output) == ARRAY_SUCCESS)
+    // Loop through array
+    for (size_t i = 0; i < arr->size; i++)
     {
-        printf("Got \"%s\" from string array\n", output);
+        if (get_string(arr, i, &output) == ARRAY_SUCCESS)
+        {
+            printf("Got \"%s\" from string array\n", output);
+        }
+        else
+        {
+            printf("Failed to get from string array\n");
+        }
+    }
+
+    // Remove all
+    size_t size = arr->size;
+    for (size_t i = 0; i < size; i++)
+    {
+        if (remove_string(arr, 0, &output) == ARRAY_SUCCESS)
+        {
+            printf("Removed \"%s\" from string array\n", output);
+        }
+        else
+        {
+            printf("Failed to remove from string array\n");
+        }
+    }
+
+    // Test get and remove on empty array
+    if (get_string(arr, 0, &output) == ARRAY_INDEX_OUT_OF_BOUNDS)
+    {
+        printf("Index out of bounds\n");
     }
     else
     {
-        printf("Failed to get from string array\n");
+        printf("Failed to get from empty string array\n");
     }
 
-    if (remove_string(arr, 1, &output) == ARRAY_SUCCESS)
+    if (remove_string(arr, 0, &output) == ARRAY_INDEX_OUT_OF_BOUNDS)
     {
-        printf("Removed \"%s\" from string array\n", output);
+        printf("Index out of bounds\n");
     }
     else
     {
-        printf("Failed to remove from string array\n");
+        printf("Failed to remove from empty string array\n");
     }
 
-    free_array(arr);
+    free_string_array(arr);
     printf("String array extended test complete\n\n");
 }
 

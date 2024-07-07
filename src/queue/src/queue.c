@@ -1,4 +1,5 @@
 #include "queue.h"
+#include "data_structure_utils.h"
 
 int is_queue_full(queue_t *queue)
 {
@@ -37,6 +38,51 @@ queue_t *create_queue(size_t element_size)
     queue->element_size = element_size;
 
     return queue;
+}
+
+void copy_func(void *dest, void *src, size_t size)
+{
+    memcpy(dest, src, size);
+}
+
+void free_func(void *data)
+{
+    free(data);
+}
+
+queue_error_t resize_queue(queue_t *queue, size_t new_capacity)
+{
+    resize_error_t result = resize_data_structure(
+        (void **)&queue->data,
+        &queue->capacity,
+        &queue->size,
+        queue->element_size,
+        new_capacity,
+        copy_func,
+        free_func);
+
+    if (result != RESIZE_SUCCESS)
+    {
+        return QUEUE_MEMORY_ERROR;
+    }
+
+    return QUEUE_SUCCESS;
+}
+
+queue_error_t shrink_queue(queue_t *queue)
+{
+    resize_error_t result = shrink_data_structure(
+        queue,
+        &queue->capacity,
+        &queue->size,
+        (resize_func_t)resize_queue);
+
+    if (result != RESIZE_SUCCESS)
+    {
+        return QUEUE_MEMORY_ERROR;
+    }
+
+    return QUEUE_SUCCESS;
 }
 
 queue_error_t enqueue(queue_t *queue, const void *element)
@@ -106,25 +152,11 @@ queue_error_t peek(queue_t *queue, void *output)
     return QUEUE_SUCCESS;
 }
 
-queue_error_t resize_queue(queue_t *queue, int new_capacity)
-{
-    void **new_data = (void **)realloc(queue->data, sizeof(void *) * new_capacity);
-    if (!new_data)
-    {
-        return QUEUE_MEMORY_ERROR;
-    }
-
-    queue->data = new_data;
-    queue->capacity = new_capacity;
-
-    return QUEUE_SUCCESS;
-}
-
 void free_queue(queue_t *queue)
 {
-    for (int i = 0; i < queue->size; i++)
+    for (size_t i = 0; i < queue->size; i++)
     {
-        int index = (queue->front + i) % queue->capacity;
+        size_t index = (queue->front + i) % queue->capacity;
         free(queue->data[index]);
     }
 

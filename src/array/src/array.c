@@ -1,5 +1,7 @@
 #include "array.h"
+#include "data_structure_utils.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 array_t *create_array(size_t element_size)
 {
@@ -23,40 +25,54 @@ array_t *create_array(size_t element_size)
     return arr;
 }
 
-array_error_t resize_array(array_t *arr, int new_capacity)
+void copy_func(void *dest, void *src, size_t size)
 {
-    void **new_data = (void **)realloc(arr->data, sizeof(void *) * new_capacity);
-    if (!new_data)
+    memcpy(dest, src, size);
+}
+
+void free_func(void *data)
+{
+    free(data);
+}
+
+array_error_t resize_array(array_t *arr, size_t new_capacity)
+{
+    resize_error_t result = resize_data_structure(
+        (void **)&arr->data,
+        &arr->capacity,
+        &arr->size,
+        arr->element_size,
+        new_capacity,
+        copy_func,
+        free_func);
+
+    if (result != RESIZE_SUCCESS)
     {
         return ARRAY_MEMORY_ERROR;
     }
-
-    arr->data = new_data;
-    arr->capacity = new_capacity;
 
     return ARRAY_SUCCESS;
 }
 
 array_error_t shrink_array(array_t *arr)
 {
-    if (arr->size < arr->capacity / 4 && arr->capacity > 100)
+    resize_error_t result = shrink_data_structure(
+        arr,
+        &arr->capacity,
+        &arr->size,
+        (resize_func_t)resize_array);
+
+    if (result != RESIZE_SUCCESS)
     {
-        int new_capacity = arr->capacity / 2;
-        void **new_data = (void **)realloc(arr->data, sizeof(void *) * new_capacity);
-        if (!new_data)
-        {
-            return ARRAY_MEMORY_ERROR;
-        }
-        arr->data = new_data;
-        arr->capacity = new_capacity;
+        return ARRAY_MEMORY_ERROR;
     }
 
     return ARRAY_SUCCESS;
 }
 
-array_error_t get(array_t *arr, int index, void *output)
+array_error_t get(array_t *arr, size_t index, void *output)
 {
-    if (index < 0 || index >= arr->size)
+    if (index >= arr->size)
     {
         return ARRAY_INDEX_OUT_OF_BOUNDS;
     }
@@ -65,9 +81,9 @@ array_error_t get(array_t *arr, int index, void *output)
     return ARRAY_SUCCESS;
 }
 
-array_error_t set(array_t *arr, int index, const void *element)
+array_error_t set(array_t *arr, size_t index, const void *element)
 {
-    if (index < 0 || index >= arr->size)
+    if (index >= arr->size)
     {
         return ARRAY_INDEX_OUT_OF_BOUNDS;
     }
@@ -76,9 +92,9 @@ array_error_t set(array_t *arr, int index, const void *element)
     return ARRAY_SUCCESS;
 }
 
-array_error_t insert(array_t *arr, int index, const void *element)
+array_error_t insert(array_t *arr, size_t index, const void *element)
 {
-    if (index < 0 || index > arr->size)
+    if (index > arr->size)
     {
         return ARRAY_INDEX_OUT_OF_BOUNDS;
     }
@@ -92,7 +108,7 @@ array_error_t insert(array_t *arr, int index, const void *element)
         }
     }
 
-    for (int i = arr->size; i > index; i--)
+    for (size_t i = arr->size; i > index; i--)
     {
         array_error_t set_result = set(arr, i, arr->data[i - 1]);
         if (set_result != ARRAY_SUCCESS)
@@ -112,17 +128,16 @@ array_error_t insert(array_t *arr, int index, const void *element)
     return ARRAY_SUCCESS;
 }
 
-array_error_t remove(array_t *arr, int index, void *output)
+array_error_t remove_element(array_t *arr, size_t index, void *output)
 {
-    if (index < 0 || index >= arr->size)
+    if (index >= arr->size)
     {
         return ARRAY_INDEX_OUT_OF_BOUNDS;
     }
 
     memcpy(output, arr->data[index], arr->element_size);
-    free(arr->data[index]);
 
-    for (int i = index; i < arr->size - 1; i++)
+    for (size_t i = index; i < arr->size - 1; i++)
     {
         array_error_t set_result = set(arr, i, arr->data[i + 1]);
         if (set_result != ARRAY_SUCCESS)
@@ -130,14 +145,13 @@ array_error_t remove(array_t *arr, int index, void *output)
             return set_result;
         }
     }
-
     arr->size--;
     return shrink_array(arr);
 }
 
 void free_array(array_t *arr)
 {
-    for (int i = 0; i < arr->size; i++)
+    for (size_t i = 0; i < arr->size; i++)
     {
         free(arr->data[i]);
     }
