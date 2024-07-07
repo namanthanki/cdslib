@@ -9,7 +9,7 @@ array_t *create_array(size_t element_size)
         return NULL;
     }
 
-    arr->data = (int **)malloc(sizeof(int *) * 100);
+    arr->data = (void **)malloc(sizeof(void *) * 100);
     if (!arr->data)
     {
         free(arr);
@@ -25,7 +25,7 @@ array_t *create_array(size_t element_size)
 
 array_error_t resize_array(array_t *arr, int new_capacity)
 {
-    int **new_data = (int **)realloc(arr->data, sizeof(int *) * new_capacity);
+    void **new_data = (void **)realloc(arr->data, sizeof(void *) * new_capacity);
     if (!new_data)
     {
         return ARRAY_MEMORY_ERROR;
@@ -33,6 +33,23 @@ array_error_t resize_array(array_t *arr, int new_capacity)
 
     arr->data = new_data;
     arr->capacity = new_capacity;
+
+    return ARRAY_SUCCESS;
+}
+
+array_error_t shrink_array(array_t *arr)
+{
+    if (arr->size < arr->capacity / 4 && arr->capacity > 100)
+    {
+        int new_capacity = arr->capacity / 2;
+        void **new_data = (void **)realloc(arr->data, sizeof(void *) * new_capacity);
+        if (!new_data)
+        {
+            return ARRAY_MEMORY_ERROR;
+        }
+        arr->data = new_data;
+        arr->capacity = new_capacity;
+    }
 
     return ARRAY_SUCCESS;
 }
@@ -77,7 +94,11 @@ array_error_t insert(array_t *arr, int index, const void *element)
 
     for (int i = arr->size; i > index; i--)
     {
-        set(arr, i, arr->data[i - 1]);
+        array_error_t set_result = set(arr, i, arr->data[i - 1]);
+        if (set_result != ARRAY_SUCCESS)
+        {
+            return set_result;
+        }
     }
 
     arr->data[index] = (int *)malloc(arr->element_size);
@@ -91,7 +112,7 @@ array_error_t insert(array_t *arr, int index, const void *element)
     return ARRAY_SUCCESS;
 }
 
-array_error_t remove_element(array_t *arr, int index, void *output)
+array_error_t remove(array_t *arr, int index, void *output)
 {
     if (index < 0 || index >= arr->size)
     {
@@ -103,11 +124,15 @@ array_error_t remove_element(array_t *arr, int index, void *output)
 
     for (int i = index; i < arr->size - 1; i++)
     {
-        arr->data[i] = arr->data[i + 1];
+        array_error_t set_result = set(arr, i, arr->data[i + 1]);
+        if (set_result != ARRAY_SUCCESS)
+        {
+            return set_result;
+        }
     }
 
     arr->size--;
-    return ARRAY_SUCCESS;
+    return shrink_array(arr);
 }
 
 void free_array(array_t *arr)

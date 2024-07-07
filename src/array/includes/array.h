@@ -13,7 +13,7 @@ typedef enum
 
 typedef struct
 {
-    int **data;
+    void **data;
     int size;
     int capacity;
     size_t element_size;
@@ -22,7 +22,7 @@ typedef struct
 // generic
 array_t *create_array(size_t element_size);
 array_error_t insert(array_t *arr, int index, const void *element);
-array_error_t remove_element(array_t *arr, int index, void *output);
+array_error_t remove(array_t *arr, int index, void *output);
 array_error_t get(array_t *arr, int index, void *output);
 array_error_t set(array_t *arr, int index, const void *element);
 array_error_t resize_array(array_t *arr, int new_capacity);
