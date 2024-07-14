@@ -117,7 +117,7 @@ array_error_t insert(array_t *arr, size_t index, const void *element)
         }
     }
 
-    arr->data[index] = (int *)malloc(arr->element_size);
+    arr->data[index] = (void *)malloc(arr->element_size);
     if (!arr->data[index])
     {
         return ARRAY_MEMORY_ERROR;
