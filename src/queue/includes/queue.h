@@ -22,7 +22,26 @@ typedef struct
     size_t element_size;
 } queue_t;
 
-// generuc
+#define DECLARE_QUEUE_FUNCTIONS(TYPE, SUFFIX)                    \
+    queue_t *create_##SUFFIX##_queue();                          \
+    queue_error_t enqueue_##SUFFIX(queue_t *queue, TYPE value);  \
+    queue_error_t dequeue_##SUFFIX(queue_t *queue, TYPE *value); \
+    queue_error_t peek_##SUFFIX(queue_t *queue, TYPE *value);
+
+#define DECLARE_STRING_QUEUE_FUNCTIONS                               \
+    queue_t *create_string_queue();                                  \
+    queue_error_t enqueue_string(queue_t *queue, const char *value); \
+    queue_error_t dequeue_string(queue_t *queue, char **value);      \
+    queue_error_t peek_string(queue_t *queue, char **value);         \
+    void free_string_queue(queue_t *queue);
+
+DECLARE_QUEUE_FUNCTIONS(char, char)
+DECLARE_QUEUE_FUNCTIONS(int, int)
+DECLARE_QUEUE_FUNCTIONS(float, float)
+DECLARE_QUEUE_FUNCTIONS(double, double)
+DECLARE_STRING_QUEUE_FUNCTIONS
+
+// Generic functions
 queue_t *create_queue(size_t element_size);
 queue_error_t enqueue(queue_t *queue, const void *element);
 queue_error_t dequeue(queue_t *queue, void *output);
@@ -31,35 +50,8 @@ queue_error_t resize_queue(queue_t *queue, size_t new_capacity);
 queue_error_t shrink_queue(queue_t *queue);
 void free_queue(queue_t *queue);
 
-// char
-queue_t *create_char_queue();
-queue_error_t enqueue_char(queue_t *queue, char value);
-queue_error_t dequeue_char(queue_t *queue, char *value);
-queue_error_t peek_char(queue_t *queue, char *value);
+int is_queue_full(queue_t *queue);
+int is_queue_empty(queue_t *queue);
+int queue_size(queue_t *queue);
 
-// int
-queue_t *create_int_queue();
-queue_error_t enqueue_int(queue_t *queue, int value);
-queue_error_t dequeue_int(queue_t *queue, int *value);
-queue_error_t peek_int(queue_t *queue, int *value);
-
-// float
-queue_t *create_float_queue();
-queue_error_t enqueue_float(queue_t *queue, float value);
-queue_error_t dequeue_float(queue_t *queue, float *value);
-queue_error_t peek_float(queue_t *queue, float *value);
-
-// double
-queue_t *create_double_queue();
-queue_error_t enqueue_double(queue_t *queue, double value);
-queue_error_t dequeue_double(queue_t *queue, double *value);
-queue_error_t peek_double(queue_t *queue, double *value);
-
-// string (char *)
-queue_t *create_string_queue();
-queue_error_t enqueue_string(queue_t *queue, const char *value);
-queue_error_t dequeue_string(queue_t *queue, char **value);
-queue_error_t peek_string(queue_t *queue, char **value);
-void free_string_queue(queue_t *queue);
-
-#endif
+#endif // QUEUE_H

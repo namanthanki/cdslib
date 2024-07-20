@@ -1,5 +1,92 @@
 #include "queue.h"
 #include "data_structure_utils.h"
+#include <stdlib.h>
+#include <string.h>
+
+#define DEFINE_QUEUE_FUNCTIONS(TYPE, SUFFIX)                    \
+    queue_t *create_##SUFFIX##_queue()                          \
+    {                                                           \
+        return create_queue(sizeof(TYPE));                      \
+    }                                                           \
+                                                                \
+    queue_error_t enqueue_##SUFFIX(queue_t *queue, TYPE value)  \
+    {                                                           \
+        return enqueue(queue, &value);                          \
+    }                                                           \
+                                                                \
+    queue_error_t dequeue_##SUFFIX(queue_t *queue, TYPE *value) \
+    {                                                           \
+        return dequeue(queue, value);                           \
+    }                                                           \
+                                                                \
+    queue_error_t peek_##SUFFIX(queue_t *queue, TYPE *value)    \
+    {                                                           \
+        return peek(queue, value);                              \
+    }
+
+#define DEFINE_STRING_QUEUE_FUNCTIONS                               \
+    queue_t *create_string_queue()                                  \
+    {                                                               \
+        return create_queue(sizeof(char *));                        \
+    }                                                               \
+                                                                    \
+    queue_error_t enqueue_string(queue_t *queue, const char *value) \
+    {                                                               \
+        char *copy = strdup(value);                                 \
+        if (!copy)                                                  \
+        {                                                           \
+            return QUEUE_MEMORY_ERROR;                              \
+        }                                                           \
+                                                                    \
+        queue_error_t result = enqueue(queue, &copy);               \
+                                                                    \
+        if (result != QUEUE_SUCCESS)                                \
+        {                                                           \
+            free(copy);                                             \
+        }                                                           \
+                                                                    \
+        return result;                                              \
+    }                                                               \
+                                                                    \
+    queue_error_t dequeue_string(queue_t *queue, char **value)      \
+    {                                                               \
+        char *popped_value;                                         \
+        queue_error_t result = dequeue(queue, &popped_value);       \
+        if (result == QUEUE_SUCCESS)                                \
+        {                                                           \
+            *value = popped_value;                                  \
+        }                                                           \
+        return result;                                              \
+    }                                                               \
+                                                                    \
+    queue_error_t peek_string(queue_t *queue, char **value)         \
+    {                                                               \
+        char *peeked_value;                                         \
+        queue_error_t result = peek(queue, &peeked_value);          \
+        if (result == QUEUE_SUCCESS)                                \
+        {                                                           \
+            *value = peeked_value;                                  \
+        }                                                           \
+        return result;                                              \
+    }                                                               \
+                                                                    \
+    void free_string_queue(queue_t *queue)                          \
+    {                                                               \
+        for (size_t i = 0; i < queue->size; i++)                    \
+        {                                                           \
+            size_t index = (queue->front + i) % queue->capacity;    \
+            free(queue->data[index]);                               \
+        }                                                           \
+                                                                    \
+        free(queue->data);                                          \
+        free(queue);                                                \
+    }
+
+DEFINE_QUEUE_FUNCTIONS(char, char)
+DEFINE_QUEUE_FUNCTIONS(int, int)
+DEFINE_QUEUE_FUNCTIONS(float, float)
+DEFINE_QUEUE_FUNCTIONS(double, double)
+DEFINE_STRING_QUEUE_FUNCTIONS
 
 int is_queue_full(queue_t *queue)
 {
@@ -97,7 +184,7 @@ queue_error_t enqueue(queue_t *queue, const void *element)
     }
 
     queue->rear = (queue->rear + 1) % queue->capacity;
-    queue->data[queue->rear] = (void *)malloc(queue->element_size);
+    queue->data[queue->rear] = malloc(queue->element_size);
     if (!queue->data[queue->rear])
     {
         return QUEUE_MEMORY_ERROR;
