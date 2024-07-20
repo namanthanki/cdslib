@@ -1,5 +1,85 @@
 #include "stack.h"
 #include "data_structure_utils.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+#define DEFINE_STACK_FUNCTIONS(TYPE, SUFFIX)                 \
+    stack_t *create_##SUFFIX##_stack()                       \
+    {                                                        \
+        return create_stack(sizeof(TYPE));                   \
+    }                                                        \
+                                                             \
+    stack_error_t push_##SUFFIX(stack_t *stack, TYPE value)  \
+    {                                                        \
+        return push(stack, &value);                          \
+    }                                                        \
+                                                             \
+    stack_error_t pop_##SUFFIX(stack_t *stack, TYPE *value)  \
+    {                                                        \
+        return pop(stack, value);                            \
+    }                                                        \
+                                                             \
+    stack_error_t peek_##SUFFIX(stack_t *stack, TYPE *value) \
+    {                                                        \
+        return peek(stack, value);                           \
+    }
+
+#define DEFINE_STRING_STACK_FUNCTIONS                            \
+    stack_t *create_string_stack()                               \
+    {                                                            \
+        return create_stack(sizeof(char *));                     \
+    }                                                            \
+                                                                 \
+    stack_error_t push_string(stack_t *stack, const char *value) \
+    {                                                            \
+        char *copy = strdup(value);                              \
+        if (!copy)                                               \
+        {                                                        \
+            return STACK_MEMORY_ERROR;                           \
+        }                                                        \
+                                                                 \
+        stack_error_t result = push(stack, &copy);               \
+                                                                 \
+        if (result != STACK_SUCCESS)                             \
+        {                                                        \
+            free(copy);                                          \
+        }                                                        \
+                                                                 \
+        return result;                                           \
+    }                                                            \
+                                                                 \
+    stack_error_t pop_string(stack_t *stack, char **value)       \
+    {                                                            \
+        char *popped_value;                                      \
+        stack_error_t result = pop(stack, &popped_value);        \
+        if (result == STACK_SUCCESS)                             \
+        {                                                        \
+            *value = popped_value;                               \
+        }                                                        \
+        return result;                                           \
+    }                                                            \
+                                                                 \
+    stack_error_t peek_string(stack_t *stack, char **value)      \
+    {                                                            \
+        return peek(stack, value);                               \
+    }                                                            \
+                                                                 \
+    void free_string_stack(stack_t *stack)                       \
+    {                                                            \
+        while (stack->top >= 0)                                  \
+        {                                                        \
+            char *value;                                         \
+            pop_string(stack, &value);                           \
+            free(value);                                         \
+        }                                                        \
+        free_stack(stack);                                       \
+    }
+
+DEFINE_STACK_FUNCTIONS(char, char)
+DEFINE_STACK_FUNCTIONS(int, int)
+DEFINE_STACK_FUNCTIONS(float, float)
+DEFINE_STACK_FUNCTIONS(double, double)
+DEFINE_STRING_STACK_FUNCTIONS
 
 int is_stack_full(stack_t *stack)
 {
@@ -34,7 +114,8 @@ stack_t *create_stack(size_t element_size)
     return stack;
 }
 
-void copy_func (void *dest, void *src, size_t size) {
+void copy_func(void *dest, void *src, size_t size)
+{
     memcpy(dest, src, size);
 }
 
@@ -90,7 +171,7 @@ stack_error_t push(stack_t *stack, const void *element)
     }
 
     stack->top++;
-    stack->data[stack->top] = (void *)malloc(stack->element_size);
+    stack->data[stack->top] = malloc(stack->element_size);
     if (!stack->data[stack->top])
     {
         return STACK_MEMORY_ERROR;

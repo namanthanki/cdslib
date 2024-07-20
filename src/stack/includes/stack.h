@@ -21,7 +21,26 @@ typedef struct
     size_t element_size;
 } stack_t;
 
-// generic
+#define DECLARE_STACK_FUNCTIONS(TYPE, SUFFIX)                \
+    stack_t *create_##SUFFIX##_stack();                      \
+    stack_error_t push_##SUFFIX(stack_t *stack, TYPE value); \
+    stack_error_t pop_##SUFFIX(stack_t *stack, TYPE *value); \
+    stack_error_t peek_##SUFFIX(stack_t *stack, TYPE *value);
+
+#define DECLARE_STRING_STACK_FUNCTIONS                            \
+    stack_t *create_string_stack();                               \
+    stack_error_t push_string(stack_t *stack, const char *value); \
+    stack_error_t pop_string(stack_t *stack, char **value);       \
+    stack_error_t peek_string(stack_t *stack, char **value);      \
+    void free_string_stack(stack_t *stack);
+
+DECLARE_STACK_FUNCTIONS(char, char)
+DECLARE_STACK_FUNCTIONS(int, int)
+DECLARE_STACK_FUNCTIONS(float, float)
+DECLARE_STACK_FUNCTIONS(double, double)
+DECLARE_STRING_STACK_FUNCTIONS
+
+// Generic functions
 stack_t *create_stack(size_t element_size);
 stack_error_t push(stack_t *stack, const void *element);
 stack_error_t pop(stack_t *stack, void *output);
@@ -30,35 +49,7 @@ stack_error_t resize_stack(stack_t *stack, size_t new_capacity);
 stack_error_t shrink_stack(stack_t *stack);
 void free_stack(stack_t *stack);
 
-// char
-stack_t *create_char_stack();
-stack_error_t push_char(stack_t *stack, char value);
-stack_error_t pop_char(stack_t *stack, char *value);
-stack_error_t peek_char(stack_t *stack, char *value);
+int is_stack_full(stack_t *stack);
+int is_stack_empty(stack_t *stack);
 
-// int
-stack_t *create_int_stack();
-stack_error_t push_int(stack_t *stack, int value);
-stack_error_t pop_int(stack_t *stack, int *value);
-stack_error_t peek_int(stack_t *stack, int *value);
-
-// float
-stack_t *create_float_stack();
-stack_error_t push_float(stack_t *stack, float value);
-stack_error_t pop_float(stack_t *stack, float *value);
-stack_error_t peek_float(stack_t *stack, float *value);
-
-// double
-stack_t *create_double_stack();
-stack_error_t push_double(stack_t *stack, double value);
-stack_error_t pop_double(stack_t *stack, double *value);
-stack_error_t peek_double(stack_t *stack, double *value);
-
-// string (char *)
-stack_t *create_string_stack();
-stack_error_t push_string(stack_t *stack, const char *value);
-stack_error_t pop_string(stack_t *stack, char **value);
-stack_error_t peek_string(stack_t *stack, char **value);
-void free_string_stack(stack_t *stack);
-
-#endif
+#endif // STACK_H

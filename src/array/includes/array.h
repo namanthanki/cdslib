@@ -19,6 +19,27 @@ typedef struct
     size_t element_size;
 } array_t;
 
+#define DECLARE_ARRAY_FUNCTIONS(TYPE, SUFFIX)                                \
+    array_t *create_##SUFFIX##_array();                                      \
+    array_error_t insert_##SUFFIX(array_t *arr, size_t index, TYPE element); \
+    array_error_t remove_##SUFFIX(array_t *arr, size_t index, TYPE *output); \
+    array_error_t get_##SUFFIX(array_t *arr, size_t index, TYPE *output);    \
+    array_error_t set_##SUFFIX(array_t *arr, size_t index, TYPE element);
+
+#define DECLARE_STRING_ARRAY_FUNCTIONS                                      \
+    array_t *create_string_array();                                         \
+    array_error_t insert_string(array_t *arr, size_t index, char *element); \
+    array_error_t remove_string(array_t *arr, size_t index, char **output); \
+    array_error_t get_string(array_t *arr, size_t index, char **output);    \
+    array_error_t set_string(array_t *arr, size_t index, char *element);    \
+    void free_string_array(array_t *arr);
+
+DECLARE_ARRAY_FUNCTIONS(char, char)
+DECLARE_ARRAY_FUNCTIONS(int, int)
+DECLARE_ARRAY_FUNCTIONS(float, float)
+DECLARE_ARRAY_FUNCTIONS(double, double)
+DECLARE_STRING_ARRAY_FUNCTIONS
+
 // generic
 array_t *create_array(size_t element_size);
 array_error_t insert(array_t *arr, size_t index, const void *element);
@@ -28,41 +49,5 @@ array_error_t set(array_t *arr, size_t index, const void *element);
 array_error_t resize_array(array_t *arr, size_t new_capacity);
 array_error_t shrink_array(array_t *arr);
 void free_array(array_t *arr);
-
-// char
-array_t *create_char_array();
-array_error_t insert_char(array_t *arr, size_t index, char element);
-array_error_t remove_char(array_t *arr, size_t index, char *output);
-array_error_t get_char(array_t *arr, size_t index, char *output);
-array_error_t set_char(array_t *arr, size_t index, char element);
-
-// int
-array_t *create_int_array();
-array_error_t insert_int(array_t *arr, size_t index, int element);
-array_error_t remove_int(array_t *arr, size_t index, int *output);
-array_error_t get_int(array_t *arr, size_t index, int *output);
-array_error_t set_int(array_t *arr, size_t index, int element);
-
-// float
-array_t *create_float_array();
-array_error_t insert_float(array_t *arr, size_t index, float element);
-array_error_t remove_float(array_t *arr, size_t index, float *output);
-array_error_t get_float(array_t *arr, size_t index, float *output);
-array_error_t set_float(array_t *arr, size_t index, float element);
-
-// double
-array_t *create_double_array();
-array_error_t insert_double(array_t *arr, size_t index, double element);
-array_error_t remove_double(array_t *arr, size_t index, double *output);
-array_error_t get_double(array_t *arr, size_t index, double *output);
-array_error_t set_double(array_t *arr, size_t index, double element);
-
-// string
-array_t *create_string_array();
-array_error_t insert_string(array_t *arr, size_t index, char *element);
-array_error_t remove_string(array_t *arr, size_t index, char **output);
-array_error_t get_string(array_t *arr, size_t index, char **output);
-array_error_t set_string(array_t *arr, size_t index, char *element);
-void free_string_array(array_t *arr);
 
 #endif

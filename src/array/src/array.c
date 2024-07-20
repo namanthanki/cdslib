@@ -3,6 +3,116 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define DEFINE_ARRAY_FUNCTIONS(TYPE, SUFFIX)                                \
+                                                                            \
+    array_t *create_##SUFFIX##_array()                                      \
+    {                                                                       \
+        return create_array(sizeof(TYPE));                                  \
+    }                                                                       \
+                                                                            \
+    array_error_t insert_##SUFFIX(array_t *arr, size_t index, TYPE element) \
+    {                                                                       \
+        return insert(arr, index, &element);                                \
+    }                                                                       \
+                                                                            \
+    array_error_t remove_##SUFFIX(array_t *arr, size_t index, TYPE *output) \
+    {                                                                       \
+        return remove_element(arr, index, output);                          \
+    }                                                                       \
+                                                                            \
+    array_error_t get_##SUFFIX(array_t *arr, size_t index, TYPE *output)    \
+    {                                                                       \
+        return get(arr, index, output);                                     \
+    }                                                                       \
+                                                                            \
+    array_error_t set_##SUFFIX(array_t *arr, size_t index, TYPE element)    \
+    {                                                                       \
+        return set(arr, index, &element);                                   \
+    }
+
+#define DEFINE_STRING_ARRAY_FUNCTIONS                                      \
+                                                                           \
+    array_t *create_string_array()                                         \
+    {                                                                      \
+        return create_array(sizeof(char *));                               \
+    }                                                                      \
+                                                                           \
+    array_error_t insert_string(array_t *arr, size_t index, char *element) \
+    {                                                                      \
+        char *copy = strdup(element);                                      \
+        if (!copy)                                                         \
+        {                                                                  \
+            return ARRAY_MEMORY_ERROR;                                     \
+        }                                                                  \
+                                                                           \
+        array_error_t result = insert(arr, index, &copy);                  \
+                                                                           \
+        if (result != ARRAY_SUCCESS)                                       \
+        {                                                                  \
+            free(copy);                                                    \
+        }                                                                  \
+                                                                           \
+        return result;                                                     \
+    }                                                                      \
+                                                                           \
+    array_error_t remove_string(array_t *arr, size_t index, char **output) \
+    {                                                                      \
+        char *element;                                                     \
+        array_error_t result = remove_element(arr, index, &element);       \
+        if (result == ARRAY_SUCCESS)                                       \
+        {                                                                  \
+            *output = element;                                             \
+        }                                                                  \
+        return result;                                                     \
+    }                                                                      \
+                                                                           \
+    array_error_t get_string(array_t *arr, size_t index, char **output)    \
+    {                                                                      \
+        char *element;                                                     \
+        array_error_t result = get(arr, index, &element);                  \
+        if (result == ARRAY_SUCCESS)                                       \
+        {                                                                  \
+            *output = element;                                             \
+        }                                                                  \
+        return result;                                                     \
+    }                                                                      \
+                                                                           \
+    array_error_t set_string(array_t *arr, size_t index, char *element)    \
+    {                                                                      \
+        char *copy = strdup(element);                                      \
+        if (!copy)                                                         \
+        {                                                                  \
+            return ARRAY_MEMORY_ERROR;                                     \
+        }                                                                  \
+                                                                           \
+        array_error_t result = set(arr, index, &copy);                     \
+                                                                           \
+        if (result != ARRAY_SUCCESS)                                       \
+        {                                                                  \
+            free(copy);                                                    \
+        }                                                                  \
+                                                                           \
+        return result;                                                     \
+    }                                                                      \
+                                                                           \
+    void free_string_array(array_t *arr)                                   \
+    {                                                                      \
+        for (size_t i = 0; i < arr->size; i++)                             \
+        {                                                                  \
+            char *element;                                                 \
+            remove_string(arr, i, &element);                               \
+            free(element);                                                 \
+        }                                                                  \
+                                                                           \
+        free_array(arr);                                                   \
+    }
+
+DEFINE_ARRAY_FUNCTIONS(char, char)
+DEFINE_ARRAY_FUNCTIONS(int, int)
+DEFINE_ARRAY_FUNCTIONS(float, float)
+DEFINE_ARRAY_FUNCTIONS(double, double)
+DEFINE_STRING_ARRAY_FUNCTIONS
+
 array_t *create_array(size_t element_size)
 {
     array_t *arr = (array_t *)malloc(sizeof(array_t));
