@@ -172,6 +172,8 @@ void test_string_list()
 
 int main()
 {
+    printf("Singly linked list tests:\n");
+
     test_char_list();
     test_int_list();
     test_float_list();
