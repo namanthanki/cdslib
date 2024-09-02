@@ -9,7 +9,7 @@
     }                                                                                                 \
     linked_list_error_t insert_front_##SUFFIX##_doubly(doubly_linked_list_t *list, TYPE element)      \
     {                                                                                                 \
-        return insert_front_doubly(list, &element);                                                          \
+        return insert_front_doubly(list, &element);                                                   \
     }                                                                                                 \
     linked_list_error_t insert_back_##SUFFIX##_doubly(doubly_linked_list_t *list, TYPE element)       \
     {                                                                                                 \
@@ -40,12 +40,12 @@
                                                                                                          \
     linked_list_error_t insert_front_string_doubly(doubly_linked_list_t *list, const char *element)      \
     {                                                                                                    \
-        char *copy = strdup(element);                                                                      \
+        char *copy = strdup(element);                                                                    \
         if (!copy)                                                                                       \
         {                                                                                                \
             return LINKED_LIST_MEMORY_ERROR;                                                             \
         }                                                                                                \
-        linked_list_error_t result = insert_front_doubly(list, &copy);                                          \
+        linked_list_error_t result = insert_front_doubly(list, &copy);                                   \
         if (result != LINKED_LIST_SUCCESS)                                                               \
         {                                                                                                \
             free(copy);                                                                                  \
@@ -54,12 +54,12 @@
     }                                                                                                    \
     linked_list_error_t insert_back_string_doubly(doubly_linked_list_t *list, const char *element)       \
     {                                                                                                    \
-        char *copy = strdup(element);                                                                      \
+        char *copy = strdup(element);                                                                    \
         if (!copy)                                                                                       \
         {                                                                                                \
             return LINKED_LIST_MEMORY_ERROR;                                                             \
         }                                                                                                \
-        linked_list_error_t result = insert_back_doubly(list, &copy);                                           \
+        linked_list_error_t result = insert_back_doubly(list, &copy);                                    \
         if (result != LINKED_LIST_SUCCESS)                                                               \
         {                                                                                                \
             free(copy);                                                                                  \
@@ -68,24 +68,24 @@
     }                                                                                                    \
     linked_list_error_t remove_front_string_doubly(doubly_linked_list_t *list, char **output)            \
     {                                                                                                    \
-        return remove_front_doubly(list, output);                                                               \
+        return remove_front_doubly(list, output);                                                        \
     }                                                                                                    \
     linked_list_error_t remove_back_string_doubly(doubly_linked_list_t *list, char **output)             \
     {                                                                                                    \
-        return remove_back_doubly(list, output);                                                                \
+        return remove_back_doubly(list, output);                                                         \
     }                                                                                                    \
     linked_list_error_t get_string_doubly(doubly_linked_list_t *list, size_t index, char **output)       \
     {                                                                                                    \
-        return get_doubly(list, index, output);                                                                 \
+        return get_doubly(list, index, output);                                                          \
     }                                                                                                    \
     linked_list_error_t set_string_doubly(doubly_linked_list_t *list, size_t index, const char *element) \
     {                                                                                                    \
-        char *copy = strdup(element);                                                                      \
+        char *copy = strdup(element);                                                                    \
         if (!copy)                                                                                       \
         {                                                                                                \
             return LINKED_LIST_MEMORY_ERROR;                                                             \
         }                                                                                                \
-        linked_list_error_t result = set_doubly(list, index, &copy);                                            \
+        linked_list_error_t result = set_doubly(list, index, &copy);                                     \
         if (result != LINKED_LIST_SUCCESS)                                                               \
         {                                                                                                \
             free(copy);                                                                                  \

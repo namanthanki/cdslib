@@ -12,6 +12,7 @@ QUEUE_DIR = $(SRC_DIR)/queue
 STACK_DIR = $(SRC_DIR)/stack
 LINKED_LIST_DIR = $(SRC_DIR)/linked_list
 DOUBLY_LINKED_LIST_DIR = $(SRC_DIR)/doubly_linked_list
+CIRCULAR_LINKED_LIST_DIR = $(SRC_DIR)/circular_linked_list
 
 # Libraries
 ARRAY_LIB = $(ARRAY_DIR)/libarray.a
@@ -19,13 +20,14 @@ QUEUE_LIB = $(QUEUE_DIR)/libqueue.a
 STACK_LIB = $(STACK_DIR)/libstack.a
 LINKED_LIST_LIB = $(LINKED_LIST_DIR)/liblinkedlist.a
 DOUBLY_LINKED_LIST_LIB = $(DOUBLY_LINKED_LIST_DIR)/libdoublylinkedlist.a
+CIRCULAR_LINKED_LIST_LIB = $(CIRCULAR_LINKED_LIST_DIR)/libcircularlinkedlist.a
 
 # Utility files
 UTILS_SRC = $(SRC_DIR)/data_structure_utils.c
 UTILS_OBJ = $(SRC_DIR)/data_structure_utils.o
 
 # Main targets
-all: utils array queue stack linked_list doubly_linked_list
+all: utils array queue stack linked_list doubly_linked_list circular_linked_list
 
 utils: $(UTILS_OBJ)
 
@@ -44,12 +46,15 @@ linked_list: utils
 doubly_linked_list: utils
 	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
 
+circular_linked_list: utils
+	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+
 # Compile utility object file
 $(UTILS_OBJ): $(UTILS_SRC)
 	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
 # Tests
-test: test_array test_queue test_stack test_linked_list
+test: test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list
 
 test_array: array
 	$(MAKE) -C $(ARRAY_DIR) test
@@ -66,6 +71,9 @@ test_linked_list: linked_list
 test_doubly_linked_list: doubly_linked_list
 	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) test
 
+test_circular_linked_list: circular_linked_list
+	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) test
+
 # Clean
 clean:
 	$(MAKE) -C $(ARRAY_DIR) clean
@@ -73,6 +81,7 @@ clean:
 	$(MAKE) -C $(STACK_DIR) clean
 	$(MAKE) -C $(LINKED_LIST_DIR) clean
 	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) clean
+	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) clean
 	rm -f $(UTILS_OBJ)
 
-.PHONY: all utils array queue stack linked_list test test_array test_queue test_stack test_linked_list test_doubly_linked_list clean
+.PHONY: all utils array queue stack linked_list test test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list clean
