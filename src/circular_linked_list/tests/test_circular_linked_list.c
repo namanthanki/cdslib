@@ -175,6 +175,7 @@ int main()
     test_int_circular_list();
     test_float_circular_list();
     test_double_circular_list();
+    test_string_circular_list();
 
     return 0;
 }
