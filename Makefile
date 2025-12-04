@@ -13,6 +13,9 @@ STACK_DIR = $(SRC_DIR)/stack
 LINKED_LIST_DIR = $(SRC_DIR)/linked_list
 DOUBLY_LINKED_LIST_DIR = $(SRC_DIR)/doubly_linked_list
 CIRCULAR_LINKED_LIST_DIR = $(SRC_DIR)/circular_linked_list
+VECTOR_DIR = $(SRC_DIR)/vector
+HASH_MAP_DIR = $(SRC_DIR)/hash_map
+ALGORITHMS_DIR = $(SRC_DIR)/algorithms
 
 # Libraries
 ARRAY_LIB = $(ARRAY_DIR)/libarray.a
@@ -21,13 +24,16 @@ STACK_LIB = $(STACK_DIR)/libstack.a
 LINKED_LIST_LIB = $(LINKED_LIST_DIR)/liblinkedlist.a
 DOUBLY_LINKED_LIST_LIB = $(DOUBLY_LINKED_LIST_DIR)/libdoublylinkedlist.a
 CIRCULAR_LINKED_LIST_LIB = $(CIRCULAR_LINKED_LIST_DIR)/libcircularlinkedlist.a
+VECTOR_LIB = $(VECTOR_DIR)/libvector.a
+HASH_MAP_LIB = $(HASH_MAP_DIR)/libhashmap.a
+ALGORITHMS_LIB = $(ALGORITHMS_DIR)/libalgorithms.a
 
 # Utility files
 UTILS_SRC = $(SRC_DIR)/data_structure_utils.c
 UTILS_OBJ = $(SRC_DIR)/data_structure_utils.o
 
 # Main targets
-all: utils array queue stack linked_list doubly_linked_list circular_linked_list
+all: utils array queue stack linked_list doubly_linked_list circular_linked_list vector hash_map algorithms
 
 utils: $(UTILS_OBJ)
 
@@ -49,12 +55,21 @@ doubly_linked_list: utils
 circular_linked_list: utils
 	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
 
+vector: utils
+	$(MAKE) -C $(VECTOR_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+
+hash_map: utils
+	$(MAKE) -C $(HASH_MAP_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+
+algorithms: utils
+	$(MAKE) -C $(ALGORITHMS_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+
 # Compile utility object file
 $(UTILS_OBJ): $(UTILS_SRC)
 	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
 
 # Tests
-test: test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list
+test: test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list test_vector test_hash_map test_algorithms
 
 test_array: array
 	$(MAKE) -C $(ARRAY_DIR) test
@@ -74,6 +89,15 @@ test_doubly_linked_list: doubly_linked_list
 test_circular_linked_list: circular_linked_list
 	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) test
 
+test_vector: vector
+	$(MAKE) -C $(VECTOR_DIR) test
+
+test_hash_map: hash_map
+	$(MAKE) -C $(HASH_MAP_DIR) test
+
+test_algorithms: algorithms
+	$(MAKE) -C $(ALGORITHMS_DIR) test
+
 # Clean
 clean:
 	$(MAKE) -C $(ARRAY_DIR) clean
@@ -82,6 +106,9 @@ clean:
 	$(MAKE) -C $(LINKED_LIST_DIR) clean
 	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) clean
 	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) clean
+	$(MAKE) -C $(VECTOR_DIR) clean
+	$(MAKE) -C $(HASH_MAP_DIR) clean
+	$(MAKE) -C $(ALGORITHMS_DIR) clean
 	rm -f $(UTILS_OBJ)
 
-.PHONY: all utils array queue stack linked_list test test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list clean
+.PHONY: all utils array queue stack linked_list test test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list clean vector test_vector hash_map test_hash_map algorithms test_algorithms
