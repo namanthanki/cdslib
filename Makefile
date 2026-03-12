@@ -1,114 +1,88 @@
+ifeq ($(OS),Windows_NT)
+    RM = powershell -Command "Remove-Item -Recurse -Force -ErrorAction Ignore"
+    MKDIR = powershell -Command "New-Item -ItemType Directory -Force"
+    EXE = .exe
+    FIXPATH = $(subst /,\,$1)
+else
+    RM = rm -rf
+    MKDIR = mkdir -p
+    EXE =
+    FIXPATH = $1
+endif
+
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -pedantic -std=c99 -g -I$(INC_DIR) -I./includes
+CFLAGS = -std=c99 -Wall -Wextra -Werror -pedantic -Iinclude
+DEBUG_FLAGS = -g
+RELEASE_FLAGS = -O3 -DNDEBUG
 
-# Directories
 SRC_DIR = src
-INC_DIR = includes
-TESTS_DIR = tests
+OBJ_DIR = obj
+TEST_DIR = tests
+EXAMPLE_DIR = examples
+TEST_BIN_DIR = bin/tests
+EXAMPLE_BIN_DIR = bin/examples
 
-# Data structure directories
-ARRAY_DIR = $(SRC_DIR)/array
-QUEUE_DIR = $(SRC_DIR)/queue
-STACK_DIR = $(SRC_DIR)/stack
-LINKED_LIST_DIR = $(SRC_DIR)/linked_list
-DOUBLY_LINKED_LIST_DIR = $(SRC_DIR)/doubly_linked_list
-CIRCULAR_LINKED_LIST_DIR = $(SRC_DIR)/circular_linked_list
-VECTOR_DIR = $(SRC_DIR)/vector
-HASH_MAP_DIR = $(SRC_DIR)/hash_map
-ALGORITHMS_DIR = $(SRC_DIR)/algorithms
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
-# Libraries
-ARRAY_LIB = $(ARRAY_DIR)/libarray.a
-QUEUE_LIB = $(QUEUE_DIR)/libqueue.a
-STACK_LIB = $(STACK_DIR)/libstack.a
-LINKED_LIST_LIB = $(LINKED_LIST_DIR)/liblinkedlist.a
-DOUBLY_LINKED_LIST_LIB = $(DOUBLY_LINKED_LIST_DIR)/libdoublylinkedlist.a
-CIRCULAR_LINKED_LIST_LIB = $(CIRCULAR_LINKED_LIST_DIR)/libcircularlinkedlist.a
-VECTOR_LIB = $(VECTOR_DIR)/libvector.a
-HASH_MAP_LIB = $(HASH_MAP_DIR)/libhashmap.a
-ALGORITHMS_LIB = $(ALGORITHMS_DIR)/libalgorithms.a
+TEST_SRCS = $(wildcard $(TEST_DIR)/*.c)
+TEST_BINS = $(patsubst $(TEST_DIR)/%.c, $(TEST_BIN_DIR)/%$(EXE), $(TEST_SRCS))
 
-# Utility files
-UTILS_SRC = $(SRC_DIR)/data_structure_utils.c
-UTILS_OBJ = $(SRC_DIR)/data_structure_utils.o
+EXAMPLE_SRCS = $(wildcard $(EXAMPLE_DIR)/*.c)
+EXAMPLE_BINS = $(patsubst $(EXAMPLE_DIR)/%.c, $(EXAMPLE_BIN_DIR)/%$(EXE), $(EXAMPLE_SRCS))
 
-# Main targets
-all: utils array queue stack linked_list doubly_linked_list circular_linked_list vector hash_map algorithms
+TARGET = libds.a
 
-utils: $(UTILS_OBJ)
+.PHONY: all clean debug release test examples
 
-array: utils
-	$(MAKE) -C $(ARRAY_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+all: $(TARGET)
 
-queue: utils
-	$(MAKE) -C $(QUEUE_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+$(TARGET): $(OBJS)
+	ar rcs $@ $^
 
-stack: utils
-	$(MAKE) -C $(STACK_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-linked_list: utils
-	$(MAKE) -C $(LINKED_LIST_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+$(OBJ_DIR):
+	$(MKDIR) $(OBJ_DIR)
 
-doubly_linked_list: utils
-	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+$(TEST_BIN_DIR):
+	$(MKDIR) $(TEST_BIN_DIR)
 
-circular_linked_list: utils
-	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+$(EXAMPLE_BIN_DIR):
+	$(MKDIR) $(EXAMPLE_BIN_DIR)
 
-vector: utils
-	$(MAKE) -C $(VECTOR_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+debug: CFLAGS += $(DEBUG_FLAGS)
+debug: clean all
 
-hash_map: utils
-	$(MAKE) -C $(HASH_MAP_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+release: CFLAGS += $(RELEASE_FLAGS)
+release: clean all
 
-algorithms: utils
-	$(MAKE) -C $(ALGORITHMS_DIR) INC_DIR="$(CURDIR)/$(INC_DIR)"
+test: debug $(TEST_BINS)
+ifeq ($(OS),Windows_NT)
+	@for %%f in ($(call FIXPATH,$(TEST_BINS))) do ( echo Running %%f... & %%f )
+else
+	@for test in $(TEST_BINS); do \
+		echo "Running $$test..."; \
+		./$$test; \
+	done
+endif
 
-# Compile utility object file
-$(UTILS_OBJ): $(UTILS_SRC)
-	$(CC) $(CFLAGS) -I$(INC_DIR) -c $< -o $@
+$(TEST_BIN_DIR)/%$(EXE): $(TEST_DIR)/%.c $(TARGET) | $(TEST_BIN_DIR)
+	$(CC) $(CFLAGS) $< -L. -lds -o $@
 
-# Tests
-test: test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list test_vector test_hash_map test_algorithms
+examples: $(TARGET) $(EXAMPLE_BINS)
+ifeq ($(OS),Windows_NT)
+	@for %%f in ($(call FIXPATH,$(EXAMPLE_BINS))) do ( echo Running %%f... & %%f )
+else
+	@for example in $(EXAMPLE_BINS); do \
+		echo "Running $$example..."; \
+		./$$example; \
+	done
+endif
 
-test_array: array
-	$(MAKE) -C $(ARRAY_DIR) test
+$(EXAMPLE_BIN_DIR)/%$(EXE): $(EXAMPLE_DIR)/%.c $(TARGET) | $(EXAMPLE_BIN_DIR)
+	$(CC) $(CFLAGS) $< -L. -lds -o $@
 
-test_queue: queue
-	$(MAKE) -C $(QUEUE_DIR) test
-
-test_stack: stack
-	$(MAKE) -C $(STACK_DIR) test
-
-test_linked_list: linked_list
-	$(MAKE) -C $(LINKED_LIST_DIR) test
-
-test_doubly_linked_list: doubly_linked_list
-	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) test
-
-test_circular_linked_list: circular_linked_list
-	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) test
-
-test_vector: vector
-	$(MAKE) -C $(VECTOR_DIR) test
-
-test_hash_map: hash_map
-	$(MAKE) -C $(HASH_MAP_DIR) test
-
-test_algorithms: algorithms
-	$(MAKE) -C $(ALGORITHMS_DIR) test
-
-# Clean
 clean:
-	$(MAKE) -C $(ARRAY_DIR) clean
-	$(MAKE) -C $(QUEUE_DIR) clean
-	$(MAKE) -C $(STACK_DIR) clean
-	$(MAKE) -C $(LINKED_LIST_DIR) clean
-	$(MAKE) -C $(DOUBLY_LINKED_LIST_DIR) clean
-	$(MAKE) -C $(CIRCULAR_LINKED_LIST_DIR) clean
-	$(MAKE) -C $(VECTOR_DIR) clean
-	$(MAKE) -C $(HASH_MAP_DIR) clean
-	$(MAKE) -C $(ALGORITHMS_DIR) clean
-	rm -f $(UTILS_OBJ)
-
-.PHONY: all utils array queue stack linked_list test test_array test_queue test_stack test_linked_list test_doubly_linked_list test_circular_linked_list clean vector test_vector hash_map test_hash_map algorithms test_algorithms
+	$(RM) $(OBJ_DIR) bin $(TARGET)
